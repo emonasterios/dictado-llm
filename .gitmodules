@@ -1,3 +1,6 @@
 [submodule "models/whisper.cpp"]
 	path = models/whisper.cpp
 	url = https://github.com/ggerganov/whisper.cpp.git
+[submodule "llamafile/llama.cpp"]
+	path = llamafile/llama.cpp
+	url = https://github.com/ggerganov/llama.cpp.git
