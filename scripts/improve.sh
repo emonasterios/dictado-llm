@@ -5,7 +5,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
 MODEL="$PROJECT_ROOT/llamafile/models/ggml-model-q4_0.bin"
-CLI  ="$PROJECT_ROOT/llamafile/llama.cpp/bin/llama-cli"
+CLI="$PROJECT_ROOT/llamafile/llama.cpp/bin/llama-cli"
 
 read -r -d '' PROMPT << 'EOF'
 You are a writing assistant. Improve the style, grammar, and clarity of the following text:
