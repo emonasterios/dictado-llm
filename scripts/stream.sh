@@ -1,25 +1,33 @@
-cat << 'EOF' > scripts/stream.sh
 #!/usr/bin/env bash
-set -xuo pipefail
+set -euo pipefail
 
-# Calcula la carpeta donde está este script
+# Calcula directorios
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
-# Dispositivo de audio: plughw hace el remuestreo automático
+# Dispositivo de audio (usa plughw para remuestrear)
 MIC="plughw:1,0"
 
-# Rutas absolutas al modelo y al ejecutable de whisper.cpp
+# Rutas a modelo y CLI
 MODEL="$PROJECT_ROOT/models/whisper.cpp/models/ggml-base.bin"
-CLI="$PROJECT_ROOT/models/whisper.cpp/build/bin/whisper-cli"
+CLI  ="$PROJECT_ROOT/models/whisper.cpp/build/bin/whisper-cli"
 
-# Comprueba que existen
-[ -x "$CLI" ]   || { echo "ERROR: no existe $CLI"; exit 1; }
-[ -f "$MODEL" ] || { echo "ERROR: no existe $MODEL"; exit 1; }
+# Duración de cada trozo en segundos
+CHUNK_DUR=3
 
-# Captura WAV del mic y pipe al recognizer en español, sin timestamps
-arecord -D "$MIC" -f cd -c1 -t wav | \
-  "$CLI" -m "$MODEL" -l es -f - --no-timestamps
-EOF
+# Directorio temporal para los chunks
+TMPDIR=$(mktemp -d)
+trap 'rm -rf "$TMPDIR"' EXIT
 
-chmod +x scripts/stream.sh
+echo "=== Starting live chunked dictation (chunk size = ${CHUNK_DUR}s) ==="
+
+while true; do
+  CHUNK="$TMPDIR/chunk.wav"
+  echo "--- Recording $CHUNK_DUR s to $CHUNK ---"
+  arecord -D "$MIC" -f cd -c1 -t wav -d $CHUNK_DUR "$CHUNK"
+
+  echo "--- Transcribing chunk ---"
+  "$CLI" -m "$MODEL" -l es -f "$CHUNK" --no-timestamps
+
+  echo
+done
