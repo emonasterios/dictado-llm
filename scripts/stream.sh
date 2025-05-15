@@ -10,7 +10,7 @@ MIC="plughw:1,0"
 
 # Rutas a modelo y CLI
 MODEL="$PROJECT_ROOT/models/whisper.cpp/models/ggml-base.bin"
-CLI  ="$PROJECT_ROOT/models/whisper.cpp/build/bin/whisper-cli"
+CLI="/workspace/dictado-llm/models/whisper.cpp/build/bin/whisper-cli"
 
 # Duración de cada trozo en segundos
 CHUNK_DUR=3
